@@ -1,6 +1,9 @@
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { LoginForm } from '@/components/auth/LoginForm';
+import { SignupForm } from '@/components/auth/SignupForm';
 import heroImage from '@/assets/hero-eco-station.jpg';
 import categoriesImage from '@/assets/recycling-categories.jpg';
 import { 
@@ -13,7 +16,8 @@ import {
   TrendingUp,
   Clock,
   Shield,
-  Calendar
+  Calendar,
+  X
 } from 'lucide-react';
 
 interface LandingPageProps {
@@ -21,6 +25,13 @@ interface LandingPageProps {
 }
 
 export const LandingPage = ({ onGetStarted }: LandingPageProps) => {
+  const [showAuth, setShowAuth] = useState(false);
+  const [isLogin, setIsLogin] = useState(true);
+
+  const handleAuthSuccess = () => {
+    setShowAuth(false);
+    onGetStarted();
+  };
   // Force cache refresh - QR functionality removed
   const features = [
     {
@@ -83,7 +94,7 @@ export const LandingPage = ({ onGetStarted }: LandingPageProps) => {
               <Button 
                 variant="hero" 
                 size="lg" 
-                onClick={onGetStarted}
+                onClick={() => setShowAuth(true)}
                 className="text-lg px-8 py-4"
               >
                 <Leaf className="h-5 w-5 mr-2" />
@@ -171,7 +182,7 @@ export const LandingPage = ({ onGetStarted }: LandingPageProps) => {
                 </div>
               </div>
 
-              <Button variant="hero" size="lg" className="mt-8" onClick={onGetStarted}>
+              <Button variant="hero" size="lg" className="mt-8" onClick={() => setShowAuth(true)}>
                 <Recycle className="h-5 w-5 mr-2" />
                 Explore Categories
               </Button>
@@ -208,7 +219,7 @@ export const LandingPage = ({ onGetStarted }: LandingPageProps) => {
           <Button 
             variant="secondary" 
             size="lg" 
-            onClick={onGetStarted}
+            onClick={() => setShowAuth(true)}
             className="text-lg px-8 py-4 bg-white text-primary hover:bg-white/90 shadow-glow"
           >
             <Leaf className="h-5 w-5 mr-2" />
@@ -216,6 +227,33 @@ export const LandingPage = ({ onGetStarted }: LandingPageProps) => {
           </Button>
         </div>
       </section>
+
+      {/* Auth Modal */}
+      {showAuth && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="relative">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowAuth(false)}
+              className="absolute -top-12 right-0 text-white hover:bg-white/20"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+            {isLogin ? (
+              <LoginForm 
+                onSwitchToSignup={() => setIsLogin(false)}
+                onSuccess={handleAuthSuccess}
+              />
+            ) : (
+              <SignupForm 
+                onSwitchToLogin={() => setIsLogin(true)}
+                onSuccess={handleAuthSuccess}
+              />
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

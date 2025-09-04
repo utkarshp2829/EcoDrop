@@ -73,7 +73,7 @@ export const HistoryPage = () => {
                 <TrendingUp className="h-5 w-5 text-primary" />
                 <div>
                   <p className="text-sm text-muted-foreground">Total Earnings</p>
-                  <p className="text-2xl font-bold text-primary">${totalEarnings.toFixed(2)}</p>
+                  <p className="text-2xl font-bold text-primary">₹{totalEarnings.toFixed(0)}</p>
                 </div>
               </div>
             </CardContent>
@@ -165,7 +165,7 @@ export const HistoryPage = () => {
                             <div className="flex space-x-6">
                               <div className="text-center">
                                 <p className="text-xs text-muted-foreground">Earned</p>
-                                <p className="text-sm font-medium text-success">${dropoff.totalPrice?.toFixed(2)}</p>
+                                <p className="text-sm font-medium text-success">₹{dropoff.totalPrice?.toFixed(0)}</p>
                               </div>
                               <div className="text-center">
                                 <p className="text-xs text-muted-foreground">Points</p>

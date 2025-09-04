@@ -34,10 +34,10 @@ export const AdminDashboard = () => {
   ];
 
   const stations = [
-    { id: 1, name: 'Central Hub', status: 'active', capacity: '85%', location: 'Downtown' },
-    { id: 2, name: 'North Station', status: 'active', capacity: '62%', location: 'North District' },
-    { id: 3, name: 'East Point', status: 'maintenance', capacity: '0%', location: 'East Side' },
-    { id: 4, name: 'West Gate', status: 'active', capacity: '73%', location: 'West End' }
+    { id: 1, name: 'Manipal University Campus', status: 'active', capacity: '85%', location: 'Dehmi Kalan' },
+    { id: 2, name: 'Jaipur City Hub', status: 'active', capacity: '62%', location: 'C-Scheme' },
+    { id: 3, name: 'Bagru Industrial Station', status: 'maintenance', capacity: '0%', location: 'Bagru Area' },
+    { id: 4, name: 'IT Park Center', status: 'active', capacity: '73%', location: 'Sitapura' }
   ];
 
   return (

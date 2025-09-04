@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -12,24 +14,48 @@ import {
   Menu, 
   X,
   Leaf,
-  Clock
+  Clock,
+  LogOut
 } from 'lucide-react';
 
 interface NavigationProps {
-  currentPage: string;
-  onPageChange: (page: string) => void;
+  currentPage?: string;
+  onPageChange?: (page: string) => void;
 }
 
 export const Navigation = ({ currentPage, onPageChange }: NavigationProps) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { currentUser, logout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  
+  // Determine current page from URL if not provided
+  const activePage = currentPage || location.pathname.replace('/', '') || 'home';
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/');
+    } catch (error) {
+      console.error('Failed to log out:', error);
+    }
+  };
 
   const navigationItems = [
-    { id: 'home', label: 'Home', icon: Leaf },
-    { id: 'schedule', label: 'Schedule', icon: Calendar },
-    { id: 'rewards', label: 'Rewards', icon: Gift },
-    { id: 'history', label: 'History', icon: Clock },
-    { id: 'profile', label: 'Profile', icon: User }
+    { id: 'home', label: 'Home', icon: Leaf, path: '/user' },
+    { id: 'schedule', label: 'Schedule', icon: Calendar, path: '/user' },
+    { id: 'rewards', label: 'Rewards', icon: Gift, path: '/user' },
+    { id: 'history', label: 'History', icon: Clock, path: '/user' },
+    { id: 'profile', label: 'Profile', icon: User, path: '/user' }
   ];
+
+  const handleNavigation = (item: any) => {
+    if (onPageChange) {
+      onPageChange(item.id);
+    } else {
+      navigate(item.path);
+    }
+  };
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
@@ -50,9 +76,9 @@ export const Navigation = ({ currentPage, onPageChange }: NavigationProps) => {
               {navigationItems.map(({ id, label, icon: Icon }) => (
                 <Button
                   key={id}
-                  variant={currentPage === id ? 'secondary' : 'ghost'}
+                  variant={activePage === id ? 'secondary' : 'ghost'}
                   size="sm"
-                  onClick={() => onPageChange(id)}
+                  onClick={() => handleNavigation({ id, path: '/user' })}
                   className="text-primary-foreground hover:bg-white/10 transition-smooth"
                 >
                   <Icon className="h-4 w-4 mr-2" />
@@ -61,12 +87,29 @@ export const Navigation = ({ currentPage, onPageChange }: NavigationProps) => {
               ))}
             </div>
 
-            {/* Points Badge & Mobile Menu Toggle */}
+            {/* User Info & Mobile Menu Toggle */}
             <div className="flex items-center space-x-3">
-              <Badge variant="secondary" className="bg-white/20 text-primary-foreground">
-                <Gift className="h-3 w-3 mr-1" />
-                {userProfile.pointsBalance}
-              </Badge>
+              {currentUser && (
+                <>
+                  <Badge variant="secondary" className="bg-white/20 text-primary-foreground">
+                    <Gift className="h-3 w-3 mr-1" />
+                    {userProfile.pointsBalance}
+                  </Badge>
+                  <div className="hidden md:flex items-center space-x-2">
+                    <span className="text-sm text-primary-foreground">
+                      {currentUser.displayName || currentUser.email}
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleLogout}
+                      className="text-primary-foreground hover:bg-white/10"
+                    >
+                      <LogOut className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </>
+              )}
               
               <Button
                 variant="ghost"
@@ -87,10 +130,10 @@ export const Navigation = ({ currentPage, onPageChange }: NavigationProps) => {
               {navigationItems.map(({ id, label, icon: Icon }) => (
                 <Button
                   key={id}
-                  variant={currentPage === id ? 'secondary' : 'ghost'}
+                  variant={activePage === id ? 'secondary' : 'ghost'}
                   size="sm"
                   onClick={() => {
-                    onPageChange(id);
+                    handleNavigation({ id, path: '/user' });
                     setIsMenuOpen(false);
                   }}
                   className="w-full justify-start text-primary-foreground hover:bg-white/10"
@@ -100,59 +143,31 @@ export const Navigation = ({ currentPage, onPageChange }: NavigationProps) => {
                 </Button>
               ))}
               
-              {/* Role-based buttons for mobile */}
-              <div className="flex space-x-2 mt-4 pt-4 border-t border-white/20">
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => {
-                    onPageChange('volunteer');
-                    setIsMenuOpen(false);
-                  }}
-                  className={`flex-1 text-xs border-white/30 text-primary-foreground hover:bg-white/10 ${
-                    currentPage === 'volunteer' ? 'bg-white/20 border-white' : ''
-                  }`}
-                >
-                  Volunteer
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => {
-                    onPageChange('admin');
-                    setIsMenuOpen(false);
-                  }}
-                  className={`flex-1 text-xs border-white/30 text-primary-foreground hover:bg-white/10 ${
-                    currentPage === 'admin' ? 'bg-white/20 border-white' : ''
-                  }`}
-                >
-                  Admin
-                </Button>
-              </div>
+              {/* User info and logout for mobile */}
+              {currentUser && (
+                <div className="pt-4 border-t border-white/20">
+                  <div className="px-3 py-2 text-sm text-primary-foreground/80">
+                    {currentUser.displayName || currentUser.email}
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      handleLogout();
+                      setIsMenuOpen(false);
+                    }}
+                    className="w-full justify-start text-primary-foreground hover:bg-white/10"
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Sign Out
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         )}
       </nav>
 
-      {/* Desktop Role Buttons */}
-      <div className="hidden md:flex bg-background border-b border-border px-4 py-2 space-x-2 justify-center">
-        <Button 
-          variant="outline" 
-          size="sm"
-          onClick={() => onPageChange('volunteer')}
-          className={`text-xs ${currentPage === 'volunteer' ? 'bg-primary/10 border-primary' : ''}`}
-        >
-          Volunteer Portal
-        </Button>
-        <Button 
-          variant="outline" 
-          size="sm"
-          onClick={() => onPageChange('admin')}
-          className={`text-xs ${currentPage === 'admin' ? 'bg-primary/10 border-primary' : ''}`}
-        >
-          Admin Panel
-        </Button>
-      </div>
     </>
   );
 };
