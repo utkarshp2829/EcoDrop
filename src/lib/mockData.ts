@@ -43,7 +43,6 @@ export interface DropoffSchedule {
     unit: string;
   }>;
   status: 'PENDING' | 'CHECKED_IN' | 'CANCELLED';
-  qrCode: string;
   totalPoints?: number;
   totalPrice?: number;
 }
@@ -210,7 +209,6 @@ export const userHistory: DropoffSchedule[] = [
       { categoryId: 'paper', categoryName: 'Paper & Cardboard', declaredQty: 4.0, unit: 'kg' }
     ],
     status: 'CHECKED_IN',
-    qrCode: 'QR123456789',
     totalPoints: 57,
     totalPrice: 13.45
   },
@@ -222,7 +220,6 @@ export const userHistory: DropoffSchedule[] = [
       { categoryId: 'ewaste', categoryName: 'Electronics', declaredQty: 1, unit: 'count' }
     ],
     status: 'CHECKED_IN',
-    qrCode: 'QR987654321',
     totalPoints: 50,
     totalPrice: 15.0
   },
@@ -233,8 +230,7 @@ export const userHistory: DropoffSchedule[] = [
     items: [
       { categoryId: 'glass', categoryName: 'Glass Containers', declaredQty: 1.8, unit: 'kg' }
     ],
-    status: 'PENDING',
-    qrCode: 'QR456789123'
+    status: 'PENDING'
   }
 ];
 

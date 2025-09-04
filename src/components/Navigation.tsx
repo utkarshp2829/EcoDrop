@@ -12,7 +12,6 @@ import {
   Menu, 
   X,
   Leaf,
-  QrCode 
 } from 'lucide-react';
 
 interface NavigationProps {
@@ -26,7 +25,7 @@ export const Navigation = ({ currentPage, onPageChange }: NavigationProps) => {
   const navItems = [
     { id: 'home', label: 'Home', icon: Home },
     { id: 'schedule', label: 'Schedule', icon: Calendar },
-    { id: 'scan', label: 'QR Scan', icon: QrCode },
+    
     { id: 'rewards', label: 'Rewards', icon: Gift },
     { id: 'history', label: 'History', icon: History },
     { id: 'profile', label: 'Profile', icon: User }

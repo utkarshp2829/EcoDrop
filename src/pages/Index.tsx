@@ -3,7 +3,7 @@ import { Navigation } from '@/components/Navigation';
 import { LandingPage } from '@/components/LandingPage';
 import { Dashboard } from '@/components/Dashboard';
 import { SchedulePage } from '@/components/SchedulePage';
-import { QRPage } from '@/components/QRPage';
+
 import { RewardsPage } from '@/components/RewardsPage';
 import { HistoryPage } from '@/components/HistoryPage';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,7 +21,7 @@ const Index = () => {
 
   const handleScheduleComplete = (data: any) => {
     setScheduleData(data);
-    setCurrentPage('qr');
+    setCurrentPage('home');
   };
 
   const renderPage = () => {
@@ -40,37 +40,6 @@ const Index = () => {
           />
         );
       
-      case 'qr':
-        return (
-          <QRPage 
-            scheduleData={scheduleData}
-            onBack={() => setCurrentPage('schedule')}
-            onDashboard={() => setCurrentPage('home')}
-          />
-        );
-      
-      case 'scan':
-        return (
-          <div className="min-h-screen bg-background flex items-center justify-center p-8">
-            <Card className="max-w-md mx-auto shadow-card-eco text-center">
-              <CardHeader>
-                <CardTitle className="flex items-center justify-center space-x-2">
-                  <span className="text-2xl">📱</span>
-                  <span>QR Scanner</span>
-                </CardTitle>
-                <CardDescription>Volunteer feature for scanning drop-off QR codes</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-4">
-                  This feature would integrate camera access to scan QR codes for volunteers at recycling stations.
-                </p>
-                <Button variant="outline" onClick={() => setCurrentPage('home')}>
-                  Back to Dashboard
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        );
       
       case 'rewards':
         return <RewardsPage />;

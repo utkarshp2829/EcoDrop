@@ -6,14 +6,14 @@ import categoriesImage from '@/assets/recycling-categories.jpg';
 import { 
   Leaf, 
   Recycle, 
-  QrCode, 
   Gift, 
   MapPin, 
   Award,
   Users,
   TrendingUp,
   Clock,
-  Shield
+  Shield,
+  Calendar
 } from 'lucide-react';
 
 interface LandingPageProps {
@@ -23,9 +23,9 @@ interface LandingPageProps {
 export const LandingPage = ({ onGetStarted }: LandingPageProps) => {
   const features = [
     {
-      icon: QrCode,
-      title: 'Easy QR Scheduling',
-      description: 'Schedule your waste drop-off and get instant QR codes for seamless check-in.'
+      icon: Calendar,
+      title: 'Easy Scheduling',
+      description: 'Schedule your waste drop-off appointments with flexible time slots.'
     },
     {
       icon: MapPin,
@@ -87,14 +87,6 @@ export const LandingPage = ({ onGetStarted }: LandingPageProps) => {
               >
                 <Leaf className="h-5 w-5 mr-2" />
                 Start Recycling Today
-              </Button>
-              <Button 
-                variant="outline" 
-                size="lg"
-                className="bg-white/10 border-white/30 text-primary-foreground hover:bg-white/20"
-              >
-                <QrCode className="h-5 w-5 mr-2" />
-                Scan QR Code
               </Button>
             </div>
           </div>
