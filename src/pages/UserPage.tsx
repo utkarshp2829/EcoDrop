@@ -9,10 +9,12 @@ import { HistoryPage } from '@/components/HistoryPage';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { userProfile } from '@/lib/mockData';
-import { User, Settings, LogOut, Leaf } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { User, Settings, Leaf, LogOut, Mail, Calendar, MapPin } from 'lucide-react';
 
 const UserPage = () => {
   const navigate = useNavigate();
+  const { currentUser, logout } = useAuth();
   const [currentPage, setCurrentPage] = useState('home');
   const [scheduleData, setScheduleData] = useState<any>(null);
 
@@ -64,28 +66,73 @@ const UserPage = () => {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="text-sm text-muted-foreground">Name</label>
-                        <p className="font-medium">{userProfile.name}</p>
+                    {/* User Avatar and Basic Info */}
+                    <div className="flex items-center space-x-4 mb-6">
+                      <div className="w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center">
+                        <User className="h-8 w-8 text-primary-foreground" />
                       </div>
                       <div>
-                        <label className="text-sm text-muted-foreground">Email</label>
-                        <p className="font-medium">{userProfile.email}</p>
+                        <h3 className="text-xl font-semibold text-foreground">
+                          {currentUser?.displayName || 'User'}
+                        </h3>
+                        <p className="text-muted-foreground">EcoDrop Member</p>
                       </div>
-                    </div>
-                    
-                    <div>
-                      <label className="text-sm text-muted-foreground">Address</label>
-                      <p className="font-medium">{userProfile.address}</p>
-                    </div>
-                    
-                    <div>
-                      <label className="text-sm text-muted-foreground">Locality</label>
-                      <p className="font-medium">{userProfile.locality}</p>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4 pt-4 border-t">
+                    {/* User Details */}
+                    <div className="space-y-4">
+                      <div className="flex items-center space-x-3">
+                        <Mail className="h-4 w-4 text-muted-foreground" />
+                        <div>
+                          <label className="text-sm text-muted-foreground">Email Address</label>
+                          <p className="font-medium">{currentUser?.email || 'Not provided'}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center space-x-3">
+                        <User className="h-4 w-4 text-muted-foreground" />
+                        <div>
+                          <label className="text-sm text-muted-foreground">Display Name</label>
+                          <p className="font-medium">{currentUser?.displayName || 'Not set'}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <Calendar className="h-4 w-4 text-muted-foreground" />
+                        <div>
+                          <label className="text-sm text-muted-foreground">Member Since</label>
+                          <p className="font-medium">
+                            {currentUser?.metadata?.creationTime 
+                              ? new Date(currentUser.metadata.creationTime).toLocaleDateString('en-US', {
+                                  year: 'numeric',
+                                  month: 'long',
+                                  day: 'numeric'
+                                })
+                              : 'Unknown'
+                            }
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <MapPin className="h-4 w-4 text-muted-foreground" />
+                        <div>
+                          <label className="text-sm text-muted-foreground">Address</label>
+                          <p className="font-medium">{userProfile.address}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center space-x-3">
+                        <MapPin className="h-4 w-4 text-muted-foreground" />
+                        <div>
+                          <label className="text-sm text-muted-foreground">Locality</label>
+                          <p className="font-medium">{userProfile.locality}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Stats Section */}
+                    <div className="grid grid-cols-2 gap-4 pt-6 border-t">
                       <div className="text-center">
                         <p className="text-2xl font-bold text-primary">{userProfile.pointsBalance}</p>
                         <p className="text-sm text-muted-foreground">Points Balance</p>
@@ -93,6 +140,18 @@ const UserPage = () => {
                       <div className="text-center">
                         <p className="text-2xl font-bold text-success">{userProfile.totalDropoffs}</p>
                         <p className="text-sm text-muted-foreground">Total Drop-offs</p>
+                      </div>
+                    </div>
+
+                    {/* Additional Stats */}
+                    <div className="grid grid-cols-2 gap-4 pt-4">
+                      <div className="text-center">
+                        <p className="text-2xl font-bold text-accent">{userProfile.totalWasteRecycled} kg</p>
+                        <p className="text-sm text-muted-foreground">Waste Recycled</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-2xl font-bold text-warning">{userProfile.totalPointsEarned}</p>
+                        <p className="text-sm text-muted-foreground">Total Points Earned</p>
                       </div>
                     </div>
                   </CardContent>
@@ -119,7 +178,18 @@ const UserPage = () => {
                       <Leaf className="h-4 w-4 mr-2" />
                       Privacy Settings
                     </Button>
-                    <Button variant="destructive" className="w-full justify-start mt-6">
+                    <Button 
+                      variant="destructive" 
+                      className="w-full justify-start mt-6"
+                      onClick={async () => {
+                        try {
+                          await logout();
+                          navigate('/');
+                        } catch (error) {
+                          console.error('Failed to log out:', error);
+                        }
+                      }}
+                    >
                       <LogOut className="h-4 w-4 mr-2" />
                       Sign Out
                     </Button>
