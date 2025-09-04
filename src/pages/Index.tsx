@@ -3,7 +3,9 @@ import { Navigation } from '@/components/Navigation';
 import { LandingPage } from '@/components/LandingPage';
 import { Dashboard } from '@/components/Dashboard';
 import { SchedulePage } from '@/components/SchedulePage';
-
+import { AppointmentConfirmation } from '@/components/AppointmentConfirmation';
+import { VolunteerDashboard } from '@/components/VolunteerDashboard';
+import { AdminDashboard } from '@/components/AdminDashboard';
 import { RewardsPage } from '@/components/RewardsPage';
 import { HistoryPage } from '@/components/HistoryPage';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,7 +23,7 @@ const Index = () => {
 
   const handleScheduleComplete = (data: any) => {
     setScheduleData(data);
-    setCurrentPage('home');
+    setCurrentPage('confirmation');
   };
 
   const renderPage = () => {
@@ -39,6 +41,20 @@ const Index = () => {
             onScheduleComplete={handleScheduleComplete}
           />
         );
+      case 'confirmation':
+        return (
+          <AppointmentConfirmation 
+            scheduleData={scheduleData}
+            onBack={() => setCurrentPage('schedule')}
+            onDashboard={() => setCurrentPage('home')}
+          />
+        );
+      
+      case 'volunteer':
+        return <VolunteerDashboard />;
+      
+      case 'admin':
+        return <AdminDashboard />;
       
       
       case 'rewards':

@@ -12,6 +12,7 @@ import {
   Menu, 
   X,
   Leaf,
+  Clock
 } from 'lucide-react';
 
 interface NavigationProps {
@@ -22,12 +23,11 @@ interface NavigationProps {
 export const Navigation = ({ currentPage, onPageChange }: NavigationProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const navItems = [
-    { id: 'home', label: 'Home', icon: Home },
+  const navigationItems = [
+    { id: 'home', label: 'Home', icon: Leaf },
     { id: 'schedule', label: 'Schedule', icon: Calendar },
-    
     { id: 'rewards', label: 'Rewards', icon: Gift },
-    { id: 'history', label: 'History', icon: History },
+    { id: 'history', label: 'History', icon: Clock },
     { id: 'profile', label: 'Profile', icon: User }
   ];
 
@@ -47,7 +47,7 @@ export const Navigation = ({ currentPage, onPageChange }: NavigationProps) => {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-1">
-              {navItems.map(({ id, label, icon: Icon }) => (
+              {navigationItems.map(({ id, label, icon: Icon }) => (
                 <Button
                   key={id}
                   variant={currentPage === id ? 'secondary' : 'ghost'}
@@ -84,7 +84,7 @@ export const Navigation = ({ currentPage, onPageChange }: NavigationProps) => {
         {isMenuOpen && (
           <div className="md:hidden bg-white/10 backdrop-blur-sm">
             <div className="px-4 py-2 space-y-1">
-              {navItems.map(({ id, label, icon: Icon }) => (
+              {navigationItems.map(({ id, label, icon: Icon }) => (
                 <Button
                   key={id}
                   variant={currentPage === id ? 'secondary' : 'ghost'}
@@ -99,10 +99,60 @@ export const Navigation = ({ currentPage, onPageChange }: NavigationProps) => {
                   {label}
                 </Button>
               ))}
+              
+              {/* Role-based buttons for mobile */}
+              <div className="flex space-x-2 mt-4 pt-4 border-t border-white/20">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => {
+                    onPageChange('volunteer');
+                    setIsMenuOpen(false);
+                  }}
+                  className={`flex-1 text-xs border-white/30 text-primary-foreground hover:bg-white/10 ${
+                    currentPage === 'volunteer' ? 'bg-white/20 border-white' : ''
+                  }`}
+                >
+                  Volunteer
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => {
+                    onPageChange('admin');
+                    setIsMenuOpen(false);
+                  }}
+                  className={`flex-1 text-xs border-white/30 text-primary-foreground hover:bg-white/10 ${
+                    currentPage === 'admin' ? 'bg-white/20 border-white' : ''
+                  }`}
+                >
+                  Admin
+                </Button>
+              </div>
             </div>
           </div>
         )}
       </nav>
+
+      {/* Desktop Role Buttons */}
+      <div className="hidden md:flex bg-background border-b border-border px-4 py-2 space-x-2 justify-center">
+        <Button 
+          variant="outline" 
+          size="sm"
+          onClick={() => onPageChange('volunteer')}
+          className={`text-xs ${currentPage === 'volunteer' ? 'bg-primary/10 border-primary' : ''}`}
+        >
+          Volunteer Portal
+        </Button>
+        <Button 
+          variant="outline" 
+          size="sm"
+          onClick={() => onPageChange('admin')}
+          className={`text-xs ${currentPage === 'admin' ? 'bg-primary/10 border-primary' : ''}`}
+        >
+          Admin Panel
+        </Button>
+      </div>
     </>
   );
 };
