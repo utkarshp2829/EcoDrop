@@ -46,13 +46,16 @@ export const HistoryPage = () => {
     }
   };
 
-  const totalEarnings = userHistory
-    .filter(h => h.status === 'CHECKED_IN')
-    .reduce((sum, h) => sum + (h.totalPrice || 0), 0);
+  const totalEarnings = 0;
 
   const totalPointsFromHistory = userHistory
     .filter(h => h.status === 'CHECKED_IN')
     .reduce((sum, h) => sum + (h.totalPoints || 0), 0);
+
+  const totalPointsUsed = Math.max(
+    0,
+    (userProfile.totalPointsEarned || 0) - (userProfile.pointsBalance || 0)
+  );
 
   return (
     <div className="min-h-screen bg-background py-8">
@@ -72,8 +75,8 @@ export const HistoryPage = () => {
               <div className="flex items-center space-x-2">
                 <TrendingUp className="h-5 w-5 text-primary" />
                 <div>
-                  <p className="text-sm text-muted-foreground">Total Earnings</p>
-                  <p className="text-2xl font-bold text-primary">₹{totalEarnings.toFixed(0)}</p>
+                  <p className="text-sm text-muted-foreground">Total Points Earned</p>
+                  <p className="text-2xl font-bold text-primary">{userProfile.totalPointsEarned}</p>
                 </div>
               </div>
             </CardContent>
@@ -84,8 +87,8 @@ export const HistoryPage = () => {
               <div className="flex items-center space-x-2">
                 <Award className="h-5 w-5 text-success" />
                 <div>
-                  <p className="text-sm text-muted-foreground">Points Earned</p>
-                  <p className="text-2xl font-bold text-success">{totalPointsFromHistory}</p>
+                  <p className="text-sm text-muted-foreground">Total Points Used</p>
+                  <p className="text-2xl font-bold text-success">{totalPointsUsed}</p>
                 </div>
               </div>
             </CardContent>
@@ -163,10 +166,6 @@ export const HistoryPage = () => {
                         {dropoff.status === 'CHECKED_IN' && (
                           <div className="mt-4 pt-4 border-t border-border flex items-center justify-between">
                             <div className="flex space-x-6">
-                              <div className="text-center">
-                                <p className="text-xs text-muted-foreground">Earned</p>
-                                <p className="text-sm font-medium text-success">₹{dropoff.totalPrice?.toFixed(0)}</p>
-                              </div>
                               <div className="text-center">
                                 <p className="text-xs text-muted-foreground">Points</p>
                                 <p className="text-sm font-medium text-primary">{dropoff.totalPoints}</p>

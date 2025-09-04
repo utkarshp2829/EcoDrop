@@ -4,7 +4,6 @@ export interface WasteCategory {
   id: string;
   name: string;
   unit: 'kg' | 'count';
-  baseRatePerUnit: number;
   pointsPerUnit: number;
   icon: string;
   color: string;
@@ -44,7 +43,6 @@ export interface DropoffSchedule {
   }>;
   status: 'PENDING' | 'CHECKED_IN' | 'CANCELLED';
   totalPoints?: number;
-  totalPrice?: number;
 }
 
 export const wasteCategories: WasteCategory[] = [
@@ -52,7 +50,6 @@ export const wasteCategories: WasteCategory[] = [
     id: 'plastic',
     name: 'Plastic Bottles',
     unit: 'kg',
-    baseRatePerUnit: 208, // ₹208 per kg (≈$2.5)
     pointsPerUnit: 10,
     icon: '🍶',
     color: 'from-blue-400 to-blue-600'
@@ -61,7 +58,6 @@ export const wasteCategories: WasteCategory[] = [
     id: 'paper',
     name: 'Paper & Cardboard',
     unit: 'kg',
-    baseRatePerUnit: 150, // ₹150 per kg (≈$1.8)
     pointsPerUnit: 8,
     icon: '📄',
     color: 'from-amber-400 to-orange-500'
@@ -70,7 +66,6 @@ export const wasteCategories: WasteCategory[] = [
     id: 'glass',
     name: 'Glass Containers',
     unit: 'kg',
-    baseRatePerUnit: 266, // ₹266 per kg (≈$3.2)
     pointsPerUnit: 12,
     icon: '🫙',
     color: 'from-emerald-400 to-green-600'
@@ -79,7 +74,6 @@ export const wasteCategories: WasteCategory[] = [
     id: 'metal',
     name: 'Metal Cans',
     unit: 'kg',
-    baseRatePerUnit: 374, // ₹374 per kg (≈$4.5)
     pointsPerUnit: 18,
     icon: '🥫',
     color: 'from-gray-400 to-slate-600'
@@ -88,7 +82,6 @@ export const wasteCategories: WasteCategory[] = [
     id: 'ewaste',
     name: 'Electronics',
     unit: 'count',
-    baseRatePerUnit: 1245, // ₹1245 per item (≈$15)
     pointsPerUnit: 50,
     icon: '📱',
     color: 'from-purple-400 to-indigo-600'
@@ -97,7 +90,6 @@ export const wasteCategories: WasteCategory[] = [
     id: 'books',
     name: 'Books & Magazines',
     unit: 'kg',
-    baseRatePerUnit: 166, // ₹166 per kg (≈$2.0)
     pointsPerUnit: 9,
     icon: '📚',
     color: 'from-red-400 to-rose-600'
@@ -164,7 +156,7 @@ export const rewards: Reward[] = [
   {
     id: 'reward-2',
     name: 'Grocery Store Coupon',
-    description: '₹500 off your next grocery purchase',
+    description: 'Discount on your next grocery purchase',
     pointsCost: 500,
     stock: 20,
     vendor: 'Reliance Fresh',
@@ -209,8 +201,7 @@ export const userHistory: DropoffSchedule[] = [
       { categoryId: 'paper', categoryName: 'Paper & Cardboard', declaredQty: 4.0, unit: 'kg' }
     ],
     status: 'CHECKED_IN',
-    totalPoints: 57,
-    totalPrice: 1117 // ₹1117 (≈$13.45)
+    totalPoints: 57
   },
   {
     id: 'drop-2',
@@ -220,8 +211,7 @@ export const userHistory: DropoffSchedule[] = [
       { categoryId: 'ewaste', categoryName: 'Electronics', declaredQty: 1, unit: 'count' }
     ],
     status: 'CHECKED_IN',
-    totalPoints: 50,
-    totalPrice: 1245 // ₹1245 (≈$15.0)
+    totalPoints: 50
   },
   {
     id: 'drop-3',

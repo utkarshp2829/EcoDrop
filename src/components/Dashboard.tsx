@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { binStations, userProfile } from '@/lib/mockData';
+import { useAuth } from '@/contexts/AuthContext';
 import { 
   MapPin, 
   Clock, 
@@ -13,13 +14,17 @@ import {
   Gift,
   Plus
 } from 'lucide-react';
+import MapView from '@/components/MapView';
+import { useGeolocation, haversineDistanceKm } from '@/hooks/use-geolocation';
 
 interface DashboardProps {
   onSchedule: () => void;
 }
 
 export const Dashboard = ({ onSchedule }: DashboardProps) => {
+  const { currentUser } = useAuth();
   const [selectedStation, setSelectedStation] = useState<string | null>(null);
+  const { position } = useGeolocation();
 
   const nearbyStations = binStations.filter(station => station.isActive).slice(0, 3);
 
@@ -29,7 +34,7 @@ export const Dashboard = ({ onSchedule }: DashboardProps) => {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">
-            Welcome back, {userProfile.name}! 👋
+            Welcome back, {currentUser?.displayName || currentUser?.email || 'User'}! 👋
           </h1>
           <p className="text-muted-foreground">
             Ready to make a positive environmental impact today?
@@ -101,51 +106,49 @@ export const Dashboard = ({ onSchedule }: DashboardProps) => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {/* Placeholder for Google Maps */}
-                <div className="bg-gradient-card rounded-lg h-80 flex items-center justify-center border border-border">
-                  <div className="text-center">
-                    <MapPin className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground mb-4">
-                      Interactive map with station locations
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      Connect to Supabase to enable Google Maps integration
-                    </p>
-                  </div>
-                </div>
+                <MapView className="mb-6" />
 
-                <div className="mt-6 space-y-3">
-                  {nearbyStations.map((station) => (
-                    <div
-                      key={station.id}
-                      className={`p-4 rounded-lg border transition-smooth cursor-pointer ${
-                        selectedStation === station.id
-                          ? 'border-primary bg-primary/5 shadow-card-eco'
-                          : 'border-border hover:border-primary/50 hover:bg-accent/5'
-                      }`}
-                      onClick={() => setSelectedStation(station.id)}
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-foreground">{station.name}</h3>
-                          <p className="text-sm text-muted-foreground mb-2">{station.address}</p>
-                          <div className="flex items-center space-x-4 text-sm">
-                            <div className="flex items-center space-x-1">
-                              <Clock className="h-3 w-3 text-muted-foreground" />
-                              <span className="text-muted-foreground">{station.hours}</span>
-                            </div>
-                            <div className="flex items-center space-x-1">
-                              <Navigation className="h-3 w-3 text-muted-foreground" />
-                              <span className="text-muted-foreground">{station.distance} km away</span>
+                <div className="space-y-3">
+                  {nearbyStations.map((station) => {
+                    const dynamicDistance = position
+                      ? haversineDistanceKm(
+                          { latitude: position.latitude, longitude: position.longitude },
+                          { latitude: station.lat, longitude: station.lng }
+                        ).toFixed(1)
+                      : station.distance?.toString();
+
+                    return (
+                      <div
+                        key={station.id}
+                        className={`p-4 rounded-lg border transition-smooth cursor-pointer ${
+                          selectedStation === station.id
+                            ? 'border-primary bg-primary/5 shadow-card-eco'
+                            : 'border-border hover:border-primary/50 hover:bg-accent/5'
+                        }`}
+                        onClick={() => setSelectedStation(station.id)}
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-foreground">{station.name}</h3>
+                            <p className="text-sm text-muted-foreground mb-2">{station.address}</p>
+                            <div className="flex items-center space-x-4 text-sm">
+                              <div className="flex items-center space-x-1">
+                                <Clock className="h-3 w-3 text-muted-foreground" />
+                                <span className="text-muted-foreground">{station.hours}</span>
+                              </div>
+                              <div className="flex items-center space-x-1">
+                                <Navigation className="h-3 w-3 text-muted-foreground" />
+                                <span className="text-muted-foreground">{dynamicDistance} km away</span>
+                              </div>
                             </div>
                           </div>
+                          <Badge variant="secondary" className="ml-4">
+                            {station.supportedCategories.length} categories
+                          </Badge>
                         </div>
-                        <Badge variant="secondary" className="ml-4">
-                          {station.supportedCategories.length} categories
-                        </Badge>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </CardContent>
             </Card>

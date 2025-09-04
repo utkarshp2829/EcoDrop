@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -15,7 +16,9 @@ import {
   X,
   Leaf,
   Clock,
-  LogOut
+  LogOut,
+  Sun,
+  Moon
 } from 'lucide-react';
 
 interface NavigationProps {
@@ -27,6 +30,7 @@ export const Navigation = ({ currentPage, onPageChange }: NavigationProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { currentUser, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   
   // Determine current page from URL if not provided
@@ -79,7 +83,11 @@ export const Navigation = ({ currentPage, onPageChange }: NavigationProps) => {
                   variant={activePage === id ? 'secondary' : 'ghost'}
                   size="sm"
                   onClick={() => handleNavigation({ id, path: '/user' })}
-                  className="text-primary-foreground hover:bg-white/10 transition-smooth"
+                  className={`transition-smooth ${
+                    activePage === id 
+                      ? 'bg-white/20 text-primary-foreground font-semibold' 
+                      : 'text-primary-foreground hover:bg-white/10'
+                  }`}
                 >
                   <Icon className="h-4 w-4 mr-2" />
                   {label}
@@ -89,6 +97,17 @@ export const Navigation = ({ currentPage, onPageChange }: NavigationProps) => {
 
             {/* User Info & Mobile Menu Toggle */}
             <div className="flex items-center space-x-3">
+              {/* Dark Mode Toggle */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={toggleTheme}
+                className="text-primary-foreground hover:bg-white/10"
+                title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+              >
+                {theme === 'light' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+              </Button>
+
               {currentUser && (
                 <>
                   <Badge variant="secondary" className="bg-white/20 text-primary-foreground">
@@ -136,16 +155,36 @@ export const Navigation = ({ currentPage, onPageChange }: NavigationProps) => {
                     handleNavigation({ id, path: '/user' });
                     setIsMenuOpen(false);
                   }}
-                  className="w-full justify-start text-primary-foreground hover:bg-white/10"
+                  className={`w-full justify-start transition-smooth ${
+                    activePage === id 
+                      ? 'bg-white/20 text-primary-foreground font-semibold' 
+                      : 'text-primary-foreground hover:bg-white/10'
+                  }`}
                 >
                   <Icon className="h-4 w-4 mr-2" />
                   {label}
                 </Button>
               ))}
               
+              {/* Dark Mode Toggle for Mobile */}
+              <div className="pt-4 border-t border-white/20">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    toggleTheme();
+                    setIsMenuOpen(false);
+                  }}
+                  className="w-full justify-start text-primary-foreground hover:bg-white/10"
+                >
+                  {theme === 'light' ? <Moon className="h-4 w-4 mr-2" /> : <Sun className="h-4 w-4 mr-2" />}
+                  {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
+                </Button>
+              </div>
+
               {/* User info and logout for mobile */}
               {currentUser && (
-                <div className="pt-4 border-t border-white/20">
+                <div className="pt-2 border-t border-white/20">
                   <div className="px-3 py-2 text-sm text-primary-foreground/80">
                     {currentUser.displayName || currentUser.email}
                   </div>
