@@ -102,7 +102,7 @@ export const SchedulePage = ({ onBack, onScheduleComplete }: SchedulePageProps) 
                           <div>
                             <h3 className="font-medium text-foreground">{category.name}</h3>
                             <p className="text-xs text-muted-foreground">
-                              ₹{category.baseRatePerUnit}/{category.unit} • {category.pointsPerUnit} pts/{category.unit}
+                              {category.pointsPerUnit} pts/{category.unit}
                             </p>
                           </div>
                         </div>
@@ -257,15 +257,6 @@ export const SchedulePage = ({ onBack, onScheduleComplete }: SchedulePageProps) 
                     <hr className="border-border" />
                     
                     <div className="space-y-2 text-sm">
-                      <div className="flex justify-between font-medium">
-                        <span>Estimated Value:</span>
-                        <span className="text-success">
-                          ₹{Object.entries(selectedCategories).reduce((total, [categoryId, qty]) => {
-                            const category = wasteCategories.find(c => c.id === categoryId)!;
-                            return total + (qty * category.baseRatePerUnit);
-                          }, 0).toFixed(0)}
-                        </span>
-                      </div>
                       <div className="flex justify-between font-medium">
                         <span>Points to Earn:</span>
                         <span className="text-primary">
