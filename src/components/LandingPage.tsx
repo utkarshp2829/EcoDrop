@@ -21,6 +21,7 @@ interface LandingPageProps {
 }
 
 export const LandingPage = ({ onGetStarted }: LandingPageProps) => {
+  // Force cache refresh - QR functionality removed
   const features = [
     {
       icon: Calendar,
