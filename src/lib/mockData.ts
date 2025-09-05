@@ -146,21 +146,21 @@ export const binStations: BinStation[] = [
 export const rewards: Reward[] = [
   {
     id: 'reward-1',
-    name: 'Coffee Shop Voucher',
+    name: 'Nescafe Campus ',
     description: 'Free medium coffee at participating cafes',
     pointsCost: 150,
     stock: 45,
-    vendor: 'Café Coffee Day',
+    vendor: 'Nescafe',
     image: '☕'
   },
   {
     id: 'reward-2',
-    name: 'Grocery Store Coupon',
-    description: 'Discount on your next grocery purchase',
+    name: 'Slice of Heaven Meal for 1 Coupon',
+    description: 'Discount on Meal for 1 coupon',
     pointsCost: 500,
     stock: 20,
-    vendor: 'Reliance Fresh',
-    image: '🛒'
+    vendor: 'slice of heaven',
+    image: '🍔'
   },
   {
     id: 'reward-3',
@@ -173,12 +173,12 @@ export const rewards: Reward[] = [
   },
   {
     id: 'reward-4',
-    name: 'Eco-Friendly Products Pack',
-    description: 'Reusable bags, bamboo utensils, and more',
+    name: 'Manipal University Jaipur Merchandise ',
+    description: 'Tshirt, Pen, Diary and more ',
     pointsCost: 750,
     stock: 12,
-    vendor: 'EcoLife Store',
-    image: '🌱'
+    vendor: 'Manipal Merchandise',
+    image: '🎁'
   },
   {
     id: 'reward-5',

@@ -71,10 +71,9 @@ export const RewardsPage = () => {
                 <Star className="h-3 w-3 mr-1" />
                 Featured Reward
               </Badge>
-              <h2 className="text-2xl font-bold mb-4">Eco-Friendly Products Pack</h2>
+              <h2 className="text-2xl font-bold mb-4">Manipal Merchandise</h2>
               <p className="text-muted-foreground mb-6">
-                Complete sustainable living starter kit with reusable bags, bamboo utensils, 
-                stainless steel water bottle, and more eco-friendly essentials.
+                Manipal tshirt, pen, diary and more
               </p>
               <div className="flex items-center space-x-4 mb-6">
                 <div className="flex items-center space-x-1">
@@ -83,7 +82,7 @@ export const RewardsPage = () => {
                 </div>
                 <div className="flex items-center space-x-1">
                   <Tag className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">EcoLife Store</span>
+                  <span className="text-muted-foreground">Manipal Store</span>
                 </div>
               </div>
               <Button 
@@ -106,7 +105,7 @@ export const RewardsPage = () => {
               </Button>
             </CardContent>
             <div className="relative bg-gradient-to-br from-success/20 to-accent/20 flex items-center justify-center p-8">
-              <div className="text-8xl opacity-50">🌱</div>
+              <div className="text-8xl opacity-50">🎁</div>
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
             </div>
           </div>
