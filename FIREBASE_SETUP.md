@@ -1,3 +1,4 @@
+l
 # Firebase Authentication Setup
 
 This project uses Firebase Authentication for user management. Follow these steps to set up Firebase for your EcoDrop application.

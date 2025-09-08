@@ -7,6 +7,12 @@ export default defineConfig({
   server: {
     host: "::",
     port: 8080,
+    watch: {
+      ignored: [
+        "**/server_py/**",
+        "**/.venv/**",
+      ],
+    },
   },
   plugins: [
     react(),

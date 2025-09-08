@@ -11,16 +11,34 @@ import { Button } from '@/components/ui/button';
 import { userProfile } from '@/lib/mockData';
 import { useAuth } from '@/contexts/AuthContext';
 import { User, Settings, Leaf, LogOut, Mail, Calendar, MapPin } from 'lucide-react';
+import { sendScheduleConfirmationEmail } from '@/lib/email';
+import Notification from '@/components/Notification';
 
 const UserPage = () => {
   const navigate = useNavigate();
   const { currentUser, logout } = useAuth();
   const [currentPage, setCurrentPage] = useState('home');
   const [scheduleData, setScheduleData] = useState<any>(null);
+  const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
-  const handleScheduleComplete = (data: any) => {
+  const handleScheduleComplete = async (data: any) => {
     setScheduleData(data);
-    setCurrentPage('confirmation');
+
+    try {
+      await sendScheduleConfirmationEmail({
+        date: data.date,
+        time: data.time,
+        stationName: data.station?.name ?? '',
+        categories: data.categories,
+      });
+      setNotification({ message: '✅ Confirmation email sent with all the details!', type: 'success' });
+    } catch (err) {
+      console.warn('Failed to trigger email confirmation', err);
+      const message = err instanceof Error ? err.message : 'Unknown error';
+      setNotification({ message: `⚠️ Failed to send confirmation email: ${message}` , type: 'error' });
+    } finally {
+      setCurrentPage('confirmation');
+    }
   };
 
   const renderPage = () => {
@@ -216,6 +234,13 @@ const UserPage = () => {
         onPageChange={setCurrentPage} 
       />
       {renderPage()}
+      {notification && (
+        <Notification 
+          message={notification.message}
+          type={notification.type}
+          onClose={() => setNotification(null)}
+        />
+      )}
     </div>
   );
 };
