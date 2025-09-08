@@ -5,6 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { wasteCategories, binStations } from '@/lib/mockData';
+import { useAuth } from '@/contexts/AuthContext';
+import { createDropoff } from '@/lib/api';
 import { 
   Calendar,
   Clock,
@@ -22,6 +24,7 @@ interface SchedulePageProps {
 }
 
 export const SchedulePage = ({ onBack, onScheduleComplete }: SchedulePageProps) => {
+  const { currentUser } = useAuth();
   const [selectedCategories, setSelectedCategories] = useState<Record<string, number>>({});
   const [selectedStation, setSelectedStation] = useState<string>('');
   const [selectedDate, setSelectedDate] = useState<string>('');
@@ -38,7 +41,7 @@ export const SchedulePage = ({ onBack, onScheduleComplete }: SchedulePageProps) 
     });
   };
 
-  const handleSchedule = () => {
+  const handleSchedule = async () => {
     const scheduleData = {
       categories: selectedCategories,
       stationId: selectedStation,
@@ -47,6 +50,19 @@ export const SchedulePage = ({ onBack, onScheduleComplete }: SchedulePageProps) 
       station: binStations.find(s => s.id === selectedStation)
     };
     onScheduleComplete(scheduleData);
+    if (!currentUser?.uid) return;
+    try {
+      await createDropoff({
+        uid: currentUser.uid,
+        categories: selectedCategories,
+        stationId: selectedStation,
+        date: selectedDate,
+        time: selectedTime,
+        station: scheduleData.station
+      });
+    } catch (e) {
+      console.error('Failed to create dropoff', e);
+    }
   };
 
   const isValid = selectedStation && selectedDate && selectedTime && Object.keys(selectedCategories).length > 0;

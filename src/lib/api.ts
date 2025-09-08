@@ -37,4 +37,30 @@ export const updateUserPoints = (uid: string, payload: { delta?: number; set?: n
 	});
 };
 
+// Drop-offs
+export const createDropoff = (payload: {
+	uid: string;
+	categories: Record<string, number>;
+	stationId: string;
+	date: string;
+	time: string;
+	station?: any;
+}): Promise<{ dropoff: any }> => {
+	return apiFetch('/api/dropoffs', {
+		method: 'POST',
+		body: JSON.stringify(payload)
+	});
+};
+
+export const listPendingDropoffs = (): Promise<{ dropoffs: any[] }> => {
+	return apiFetch('/api/dropoffs/pending');
+};
+
+export const completeDropoff = (dropoffId: string, payload: { totalPoints: number }): Promise<{ dropoff: any; userPoints: number }> => {
+	return apiFetch(`/api/dropoffs/${dropoffId}/complete`, {
+		method: 'PATCH',
+		body: JSON.stringify(payload)
+	});
+};
+
  

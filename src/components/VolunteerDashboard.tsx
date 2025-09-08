@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -13,10 +13,12 @@ import {
   Search,
   UserCheck
 } from 'lucide-react';
+import { listPendingDropoffs, completeDropoff } from '@/lib/api';
 
 export const VolunteerDashboard = () => {
   const [appointmentId, setAppointmentId] = useState('');
   const [searchResults, setSearchResults] = useState<any>(null);
+  const [pending, setPending] = useState<any[]>([]);
 
   const todayStats = [
     { label: 'Appointments Processed', value: '12', icon: CheckCircle },
@@ -25,29 +27,17 @@ export const VolunteerDashboard = () => {
     { label: 'Active Users', value: '8', icon: Users }
   ];
 
-  const recentAppointments = [
-    {
-      id: 'APT001',
-      userName: 'Sarah Johnson',
-      time: '09:30',
-      status: 'pending',
-      categories: ['plastic', 'paper']
-    },
-    {
-      id: 'APT002',
-      userName: 'Mike Chen',
-      time: '10:15',
-      status: 'completed',
-      categories: ['glass', 'metal']
-    },
-    {
-      id: 'APT003',
-      userName: 'Emma Davis',
-      time: '11:00',
-      status: 'pending',
-      categories: ['ewaste']
-    }
-  ];
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const res = await listPendingDropoffs();
+        setPending(res.dropoffs);
+      } catch (e) {
+        console.error('Failed to load pending dropoffs', e);
+      }
+    };
+    load();
+  }, []);
 
   const handleSearch = () => {
     // Mock search functionality
@@ -144,36 +134,51 @@ export const VolunteerDashboard = () => {
             </CardContent>
           </Card>
 
-          {/* Recent Appointments */}
+          {/* Pending Appointments from API */}
           <Card className="shadow-card-eco">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <Clock className="h-5 w-5 text-primary" />
-                <span>Today's Schedule</span>
+                <span>Pending Drop-offs</span>
               </CardTitle>
               <CardDescription>
-                Upcoming and recent appointments for today
+                Drop-offs awaiting check-in / completion
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {recentAppointments.map((appointment) => (
-                  <div
-                    key={appointment.id}
-                    className="flex items-center justify-between p-3 rounded-lg border border-border"
-                  >
-                    <div>
-                      <p className="font-medium">{appointment.userName}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {appointment.time} • {appointment.categories.length} categories
-                      </p>
+                {pending.length === 0 && (
+                  <p className="text-sm text-muted-foreground">No pending drop-offs.</p>
+                )}
+                {pending.map((d) => (
+                  <div key={d.id} className="p-3 rounded-lg border border-border">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">{d.station?.name || d.stationId}</p>
+                        <p className="text-sm text-muted-foreground">{d.date} {d.time}</p>
+                        <p className="text-xs text-muted-foreground">UID: {d.uid}</p>
+                      </div>
+                      <Badge variant="outline">pending</Badge>
                     </div>
-                    <Badge 
-                      variant={appointment.status === 'completed' ? 'secondary' : 'outline'}
-                      className={appointment.status === 'completed' ? 'bg-success/20 text-success' : ''}
-                    >
-                      {appointment.status}
-                    </Badge>
+                    <div className="mt-2 flex justify-end">
+                      <Button
+                        size="sm"
+                        className="bg-success text-success-foreground hover:bg-success/90"
+                        onClick={async () => {
+                          // Compute total points on the fly if needed (optional). For now ask minimal: 100 pts.
+                          const totalPoints = 100;
+                          try {
+                            await completeDropoff(d.id, { totalPoints });
+                            setPending((prev) => prev.filter((x) => x.id !== d.id));
+                          } catch (e) {
+                            console.error('Failed to complete dropoff', e);
+                          }
+                        }}
+                      >
+                        <UserCheck className="h-4 w-4 mr-2" />
+                        Mark Completed
+                      </Button>
+                    </div>
                   </div>
                 ))}
               </div>

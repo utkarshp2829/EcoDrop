@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field
 from motor.motor_asyncio import AsyncIOMotorClient
 from dotenv import load_dotenv
 from pymongo import ReturnDocument
+from uuid import uuid4
 
 
 load_dotenv()
@@ -57,6 +58,19 @@ class UpsertUserPayload(BaseModel):
 class UpdatePointsPayload(BaseModel):
 	delta: Optional[int] = None
 	set: Optional[int] = None
+
+
+class CreateDropoffPayload(BaseModel):
+	uid: str
+	categories: dict  # { categoryId: quantity }
+	stationId: str
+	date: str
+	time: str
+	station: Optional[dict] = None
+
+
+class CompleteDropoffPayload(BaseModel):
+	totalPoints: int
 
 
 @app.get("/api/health")
@@ -116,6 +130,71 @@ async def update_points(uid: str, payload: UpdatePointsPayload) -> dict:
 	if not res:
 		raise HTTPException(status_code=404, detail="User not found")
 	return {"points": int(res.get("points", 0))}
+
+
+# Create drop-off (scheduled)
+@app.post("/api/dropoffs")
+async def create_dropoff(payload: CreateDropoffPayload) -> dict:
+	if mongo_client is None:
+		raise HTTPException(status_code=500, detail="MongoDB not initialized. Set MONGODB_URI.")
+	db = mongo_client[MONGODB_DB]
+	collection = db["dropoffs"]
+	dropoff_id = str(uuid4())
+	doc = {
+		"id": dropoff_id,
+		"uid": payload.uid,
+		"categories": payload.categories,
+		"stationId": payload.stationId,
+		"date": payload.date,
+		"time": payload.time,
+		"station": payload.station,
+		"status": "PENDING",
+	}
+	await collection.insert_one(doc)
+	return {"dropoff": {k: v for k, v in doc.items() if k != "_id"}}
+
+
+# List pending drop-offs
+@app.get("/api/dropoffs/pending")
+async def list_pending_dropoffs() -> dict:
+	if mongo_client is None:
+		raise HTTPException(status_code=500, detail="MongoDB not initialized. Set MONGODB_URI.")
+	db = mongo_client[MONGODB_DB]
+	collection = db["dropoffs"]
+	items = []
+	async for d in collection.find({"status": "PENDING"}, {"_id": 0}):
+		items.append(d)
+	return {"dropoffs": items}
+
+
+# Complete a drop-off and award points
+@app.patch("/api/dropoffs/{dropoff_id}/complete")
+async def complete_dropoff(dropoff_id: str, payload: CompleteDropoffPayload) -> dict:
+	if mongo_client is None:
+		raise HTTPException(status_code=500, detail="MongoDB not initialized. Set MONGODB_URI.")
+	db = mongo_client[MONGODB_DB]
+	dropoffs = db["dropoffs"]
+	users = db["users"]
+
+	# Mark dropoff completed
+	res = await dropoffs.find_one_and_update(
+		{"id": dropoff_id, "status": "PENDING"},
+		{"$set": {"status": "COMPLETED", "totalPoints": int(payload.totalPoints)}},
+		return_document=ReturnDocument.AFTER,
+	)
+	if not res:
+		raise HTTPException(status_code=404, detail="Dropoff not found or already completed")
+
+	# Award points to user
+	user = await users.find_one_and_update(
+		{"uid": res["uid"]},
+		{"$inc": {"points": int(payload.totalPoints)}},
+		return_document=ReturnDocument.AFTER,
+	)
+	if not user:
+		raise HTTPException(status_code=404, detail="User not found")
+
+	return {"dropoff": {k: v for k, v in res.items() if k != "_id"}, "userPoints": int(user.get("points", 0))}
 
 
 # Run with: uvicorn server_py.main:app --host 0.0.0.0 --port 4000 --reload
