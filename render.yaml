@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: ecodrop-backend
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: pip install -r server_py/requirements.txt
+    startCommand: uvicorn server_py.main:app --host 0.0.0.0 --port $PORT
+    autoDeploy: true
+    healthCheckPath: /api/health
+    envVars:
+      - key: MONGODB_URI
+        sync: false
+      - key: MONGODB_DB
+        value: ecodrop
