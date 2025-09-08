@@ -14,6 +14,7 @@ import {
   UserCheck
 } from 'lucide-react';
 import { listPendingDropoffs, completeDropoff } from '@/lib/api';
+import { wasteCategories } from '@/lib/mockData';
 
 export const VolunteerDashboard = () => {
   const [appointmentId, setAppointmentId] = useState('');
@@ -50,6 +51,14 @@ export const VolunteerDashboard = () => {
         station: 'Central Recycling Hub'
       });
     }
+  };
+
+  const computeTotalPoints = (categories: Record<string, number>): number => {
+    return Object.entries(categories || {}).reduce((runningTotal, [categoryId, quantity]) => {
+      const category = wasteCategories.find(c => c.id === categoryId);
+      if (!category) return runningTotal;
+      return runningTotal + quantity * category.pointsPerUnit;
+    }, 0);
   };
 
   return (
@@ -165,8 +174,7 @@ export const VolunteerDashboard = () => {
                         size="sm"
                         className="bg-success text-success-foreground hover:bg-success/90"
                         onClick={async () => {
-                          // Compute total points on the fly if needed (optional). For now ask minimal: 100 pts.
-                          const totalPoints = 100;
+                          const totalPoints = computeTotalPoints(d.categories);
                           try {
                             await completeDropoff(d.id, { totalPoints });
                             setPending((prev) => prev.filter((x) => x.id !== d.id));
