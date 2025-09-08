@@ -8,6 +8,7 @@ import {
   updateProfile
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
+import { upsertUser } from '@/lib/api';
 
 interface AuthContextType {
   currentUser: User | null;
@@ -38,6 +39,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const signup = async (email: string, password: string, displayName: string) => {
     const { user } = await createUserWithEmailAndPassword(auth, email, password);
     await updateProfile(user, { displayName });
+    // Sync to MongoDB API
+    try {
+      await upsertUser({ uid: user.uid, email: user.email || email, displayName });
+    } catch (e) {
+      // Non-fatal for client auth
+      console.error('Failed to upsert user in API', e);
+    }
     setCurrentUser(user);
   };
 

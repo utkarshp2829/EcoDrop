@@ -28,6 +28,43 @@ npm run dev
 
 ## Development
 
+### Backend API (MongoDB)
+
+You can use either Node (Express) or Python (FastAPI).
+
+Node (Express + Mongoose): `server/index.js`
+Python (FastAPI + Motor): `server_py/main.py`
+
+Configure environment variables (for local dev you can use a `.env` file at project root):
+
+```
+MONGODB_URI=mongodb+srv://<username>:<password>@<cluster-host>/<db>?retryWrites=true&w=majority
+MONGODB_DB=ecodrop
+PORT=4000
+VITE_API_BASE_URL=http://localhost:4000
+```
+
+Run API locally in a separate terminal:
+
+```sh
+# Node
+node server/index.js
+
+# Python
+cd server_py
+python -m venv .venv
+".venv/Scripts/activate"  # Windows PowerShell
+pip install -r requirements.txt
+uvicorn server_py.main:app --host 0.0.0.0 --port 4000 --reload
+```
+
+
+Endpoints:
+
+- `POST /api/users` → upsert user `{ uid, email, displayName }`
+- `GET /api/users/:uid/points` → get points
+- `PATCH /api/users/:uid/points` → update points with `{ delta }` or `{ set }`
+
 ### Available Scripts
 
 - `npm run dev` - Start the development server

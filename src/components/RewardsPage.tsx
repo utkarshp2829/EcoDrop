@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { rewards, userProfile } from '@/lib/mockData';
+import { getUserPoints, updateUserPoints } from '@/lib/api';
+import { useAuth } from '@/contexts/AuthContext';
 import rewardsImage from '@/assets/eco-rewards.jpg';
 import { 
   Gift,
@@ -20,9 +22,30 @@ export const RewardsPage = () => {
   const [selectedReward, setSelectedReward] = useState<any>(null);
   const [showRedeemDialog, setShowRedeemDialog] = useState(false);
   const [redeemedReward, setRedeemedReward] = useState<any>(null);
+  const { currentUser } = useAuth();
+  const [points, setPoints] = useState<number | null>(null);
 
-  const handleRedeem = (reward: any) => {
-    if (userProfile.pointsBalance >= reward.pointsCost) {
+  useEffect(() => {
+    const fetchPoints = async () => {
+      if (!currentUser?.uid) return;
+      try {
+        const res = await getUserPoints(currentUser.uid);
+        setPoints(res.points);
+      } catch (e) {
+        console.error('Failed to fetch points', e);
+      }
+    };
+    fetchPoints();
+  }, [currentUser?.uid]);
+
+  const handleRedeem = async (reward: any) => {
+    const balance = points ?? userProfile.pointsBalance;
+    if (!currentUser?.uid) return;
+    if (balance < reward.pointsCost) return;
+
+    try {
+      const updated = await updateUserPoints(currentUser.uid, { delta: -reward.pointsCost });
+      setPoints(updated.points);
       setRedeemedReward({
         ...reward,
         couponCode: `ECO${Date.now().toString(36).toUpperCase()}`,
@@ -30,10 +53,12 @@ export const RewardsPage = () => {
       });
       setShowRedeemDialog(true);
       setSelectedReward(null);
+    } catch (e) {
+      console.error('Failed to redeem reward', e);
     }
   };
 
-  const canAfford = (pointsCost: number) => userProfile.pointsBalance >= pointsCost;
+  const canAfford = (pointsCost: number) => (points ?? userProfile.pointsBalance) >= pointsCost;
 
   return (
     <div className="min-h-screen bg-background py-8">
@@ -54,7 +79,7 @@ export const RewardsPage = () => {
               <div className="text-center">
                 <Gift className="h-12 w-12 mx-auto mb-3" />
                 <p className="text-primary-foreground/80 mb-1">Your Points Balance</p>
-                <p className="text-4xl font-bold">{userProfile.pointsBalance}</p>
+                <p className="text-4xl font-bold">{points ?? userProfile.pointsBalance}</p>
                 <p className="text-sm text-primary-foreground/80 mt-2">
                   Keep recycling to earn more points! 🌱
                 </p>
@@ -99,7 +124,7 @@ export const RewardsPage = () => {
                 ) : (
                   <>
                     <Clock className="h-5 w-5 mr-2" />
-                    Need {750 - userProfile.pointsBalance} more points
+                    Need {750 - (points ?? userProfile.pointsBalance)} more points
                   </>
                 )}
               </Button>
@@ -161,7 +186,7 @@ export const RewardsPage = () => {
                     ) : (
                       <>
                         <Clock className="h-4 w-4 mr-2" />
-                        Need {reward.pointsCost - userProfile.pointsBalance} more
+                        Need {reward.pointsCost - (points ?? userProfile.pointsBalance)} more
                       </>
                     )}
                   </Button>
@@ -232,12 +257,12 @@ export const RewardsPage = () => {
                 </div>
                 <div className="flex justify-between">
                   <span>Your Balance:</span>
-                  <span className="font-medium">{userProfile.pointsBalance}</span>
+                  <span className="font-medium">{points ?? userProfile.pointsBalance}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>After Redemption:</span>
                   <span className="font-medium">
-                    {userProfile.pointsBalance - selectedReward.pointsCost}
+                    {(points ?? userProfile.pointsBalance) - selectedReward.pointsCost}
                   </span>
                 </div>
               </div>

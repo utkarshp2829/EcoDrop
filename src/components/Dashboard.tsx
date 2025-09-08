@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { binStations, userProfile } from '@/lib/mockData';
+import { getUserPoints } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { 
   MapPin, 
@@ -25,6 +26,20 @@ export const Dashboard = ({ onSchedule }: DashboardProps) => {
   const { currentUser } = useAuth();
   const [selectedStation, setSelectedStation] = useState<string | null>(null);
   const { position } = useGeolocation();
+  const [points, setPoints] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchPoints = async () => {
+      if (!currentUser?.uid) return;
+      try {
+        const res = await getUserPoints(currentUser.uid);
+        setPoints(res.points);
+      } catch (e) {
+        console.error('Failed to fetch points', e);
+      }
+    };
+    fetchPoints();
+  }, [currentUser?.uid]);
 
   const nearbyStations = binStations.filter(station => station.isActive).slice(0, 3);
 
@@ -50,7 +65,7 @@ export const Dashboard = ({ onSchedule }: DashboardProps) => {
             <CardContent>
               <div className="flex items-center space-x-2">
                 <Gift className="h-5 w-5 text-primary" />
-                <span className="text-2xl font-bold text-primary">{userProfile.pointsBalance}</span>
+                <span className="text-2xl font-bold text-primary">{points ?? userProfile.pointsBalance}</span>
               </div>
             </CardContent>
           </Card>

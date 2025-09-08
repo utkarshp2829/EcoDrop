@@ -5,13 +5,13 @@ import { getAnalytics } from 'firebase/analytics';
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyDlG1hKOgeFe5upzJqCmC_C-LG5xVmF0JA",
-  authDomain: "ecodrop-app.firebaseapp.com",
-  projectId: "ecodrop-app",
-  storageBucket: "ecodrop-app.firebasestorage.app",
-  messagingSenderId: "940834556017",
-  appId: "1:940834556017:web:7c767d4fdad11722b5f3d0",
-  measurementId: "G-EFZ3YJFEDL"
+  apiKey: "AIzaSyCHoFRE1mcJbq2eaY6e-ZVg4IRL5nsUiQ0",
+  authDomain: "ecodrop-app-b6490.firebaseapp.com",
+  projectId: "ecodrop-app-b6490",
+  storageBucket: "ecodrop-app-b6490.firebasestorage.app",
+  messagingSenderId: "79318824128",
+  appId: "1:79318824128:web:7f6e2392ea5ede98592925",
+  measurementId: "G-M752M30FQJ"
 };
 
 // Initialize Firebase
