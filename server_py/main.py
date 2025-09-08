@@ -37,7 +37,10 @@ async def lifespan(app: FastAPI):
 		if mongo_client:
 			mongo_client.close()
 
-
+origins = [
+    "http://localhost:8080",              # local dev
+    "https://eco-drop-sooty.vercel.app"     
+]
 app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(
